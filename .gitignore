@@ -1,0 +1,28 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.env
+venv/
+env/
+ENV/
+
+# Large raw dataset archives (> 25MB)
+# The application uses the compressed optimized parquet files in data/
+all_male_json.zip
+IPL.csv
+6afc28b07d034_6af458274c1e8_data_pack_1.zip
+6af855c0e8386_ball_by_ball.csv
+ball_by_ball_prev.csv
+data/cricketaxis_all_t20.parquet
+backup_pre_audit_*
+0.60
+min_hp_balls)
+min_tot_balls
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
