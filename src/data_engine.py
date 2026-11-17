@@ -98,18 +98,34 @@ def build_and_cache_master_dataset(workspace_dir: str = ".", scope: str = "2022-
     return bbb
 
 
+def _optimize_memory(df: pd.DataFrame) -> pd.DataFrame:
+    """Downcasts low-cardinality string columns to category for 50% RAM reduction."""
+    cat_cols = [
+        'phase', 'bowling_category', 'pressure_tier', 'stroke', 'delivery_style',
+        'on_or_off', 'over_or_around', 'batting_type', 'bowling_type', 'stage',
+        'knock_out', 'match_format', 'extras_type', 'dismissal_type', 'comp_name'
+    ]
+    for c in cat_cols:
+        if c in df.columns:
+            df[c] = df[c].astype('category')
+    return df
+
+
 def get_master_data(workspace_dir: str = ".", scope: str = "2022-2026") -> pd.DataFrame:
     """Loads master dataset from cache, or builds it if missing."""
     if "ipl" in scope.lower():
         if os.path.exists(PARQUET_IPL_ALL_PATH):
-            return pd.read_parquet(PARQUET_IPL_ALL_PATH, engine='pyarrow')
-        return build_and_cache_master_dataset(workspace_dir, scope="ipl_2008_2026")
+            df = pd.read_parquet(PARQUET_IPL_ALL_PATH, engine='pyarrow')
+        else:
+            df = build_and_cache_master_dataset(workspace_dir, scope="ipl_2008_2026")
     else:
         if os.path.exists(PARQUET_2022_2026_PATH):
-            return pd.read_parquet(PARQUET_2022_2026_PATH, engine='pyarrow')
-        if os.path.exists(PARQUET_CACHE_PATH):
-            return pd.read_parquet(PARQUET_CACHE_PATH, engine='pyarrow')
-        return build_and_cache_master_dataset(workspace_dir, scope="2022-2026")
+            df = pd.read_parquet(PARQUET_2022_2026_PATH, engine='pyarrow')
+        elif os.path.exists(PARQUET_CACHE_PATH):
+            df = pd.read_parquet(PARQUET_CACHE_PATH, engine='pyarrow')
+        else:
+            df = build_and_cache_master_dataset(workspace_dir, scope="2022-2026")
+    return _optimize_memory(df)
 
 
 class CricketIntelligenceEngine:
